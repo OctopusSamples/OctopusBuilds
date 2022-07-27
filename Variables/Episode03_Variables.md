@@ -1,0 +1,17 @@
+- ConnectionStrings:Database - Server=#{Project.Database.Server.Name};Database=#{Project.Database.Name};User ID=#{Project.Database.User.Name};Password=#{Project.Database.User.Password};
+- Project.Database.Name - Trident
+- Project.Database.Server.Name
+    - Trident_Dev (Development Scoping)
+    - Trident_QA (QA Scoping)
+    - Trident_Staging (Staging Scoping)
+    - Trident_Prod (Production Scoping)
+- Project.Database.User.Name
+    - Trident_User_Dev (Development Scoping)
+    - Trident_User_QA (QA Scoping)
+    - Trident_User_Staging (Staging Scoping)
+    - Trident_User_Prod (Production Scoping)
+- Project.Database.User.Password
+    - Trident_User_Dev01! (Development Scoping)
+    - Trident_User_QA01! (QA Scoping)
+    - Trident_User_Staging01! (Staging Scoping)
+    - Trident_User_Prod01! (Production Scoping)
