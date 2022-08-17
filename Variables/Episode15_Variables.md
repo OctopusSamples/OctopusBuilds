@@ -1,0 +1,2 @@
+Library Variable Set SQL Verification
+- SQL.Verification.Command.List: Create Table,Alter Table,Drop Table,Drop View,Create View,Create Function,Drop Function,sp_addrolemember,sp_droprolemember,alter role,Merge,Create Schema,Alter View,Alter Table
