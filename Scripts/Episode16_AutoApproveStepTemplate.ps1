@@ -1,6 +1,7 @@
 $CommandsRequireApproval = $OctopusParameters["Databases.AutoApprove.CommandsRequireApproval"]
 $CommandsIndicatingChange = $OctopusParameters["Databases.AutoApprove.CommandsIndicatingChange"]
 $ReportPath = $OctopusParameters["Databases.AutoApproval.ReportPath"]
+$stepName = $OctopusParameters["Octopus.Action.StepName"]
 
 Write-Host "Commands requiring approval: $CommandsRequireApproval"
 Write-Host "Octopus indicating changes: $CommandsIndicatingChange"
@@ -13,8 +14,7 @@ $fileContent = Get-Content -path $ReportPath
 
 $commandListToCheck = $CommandsRequireApproval -split ","
 $commandListForChanges = $CommandsIndicatingChange -split ","
-foreach ($sqlFile in $fileListToCheck)
-{    
+
     Write-Host "Looping through all commands requiring approval for $ReportPath"
 	foreach ($command in $commandListToCheck)
     {
@@ -32,22 +32,23 @@ foreach ($sqlFile in $fileListToCheck)
     if ($ApprovalRequired -eq $true)
     {
         Write-Host "Approval is required, so there has to be changes, skipping over the changes check"
-        break
+    }
+    else
+    {
+      Write-Host "Looping through all commands indicating changes for $reportPath"
+      foreach ($command in $commandListForChanges)
+      {
+          Write-Host "Checking $ReportPath for command $command"
+          $foundCommand = $fileContent -match "$command"
+
+          if ($foundCommand)
+          {
+              Write-Highlight "$ReportPath has the command '$command'"
+              $HasDatabaseChanges = $true
+          }
+      }
     }
 
-    Write-Host "Looping through all commands indicating changes for $reportPath"
-	foreach ($command in $commandListForChanges)
-    {
-    	Write-Host "Checking $ReportPath for command $command"
-    	$foundCommand = $fileContent -match "$command"
-    
-    	if ($foundCommand)
-        {
-        	Write-Highlight "$ReportPath has the command '$command'"
-            $HasDatabaseChanges = $true
-        }
-    }
-} 
 
 if ($approvalRequired -eq $false)
 {
@@ -68,4 +69,6 @@ else
 }
 
 Set-OctopusVariable -name "ApprovalRequired" -value $ApprovalRequired
+Write-Host "Variable run conditions: ##{unless Octopus.Deployment.Error}#{Octopus.Action[$stepName].Output.ApprovalRequired}##{/unless}"
 Set-OctopusVariable -name "HasDatabaseChanges" -value $HasDatabaseChanges
+Write-Host "Variable run conditions: ##{unless Octopus.Deployment.Error}#{Octopus.Action[$stepName].Output.HasDatabaseChanges}##{/unless}"
