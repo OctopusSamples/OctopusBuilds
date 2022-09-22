@@ -1,0 +1,73 @@
+﻿@model Octopus.Trident.Web.Core.Models.ViewModels.PagedViewModel<Octopus.Trident.Web.Core.Models.InstanceModel>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <div class="text-right">
+        <a asp-action="AddInstance" class="btn btn-primary">Add Instance</a>
+    </div>
+    <br />
+    
+    @if (Model.Items.Count > 0)
+    {
+        <table class='table table-striped'>
+            <thead>
+            <tr>
+                <th>Instance</th>
+                <th>URL</th>
+                <th>Octopus Installation Id</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var instance in Model.Items)
+            {
+                <tr>
+                    <td><a asp-action="Index" asp-controller="Report" asp-route-instanceId="@instance.Id">@instance.Name</a></td>
+                    <td><a href="@instance.Url" target="_blank">@instance.Url</a></td>
+                    <td>@instance.OctopusId</td>
+                    <td>
+                        <a asp-action="EditInstance" asp-route-id="@instance.Id">Edit</a>&nbsp;
+                        <a asp-action="StartSync" asp-route-id="@instance.Id">Sync</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <nav aria-label="paging">
+            <ul class="pagination">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-currentPage="@Model.PreviousPage">Previous</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Previous</a>
+                    </li>
+                }
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-currentPage="@Model.NextPage">Next</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <div class="alert-info form-control">
+            No Instances Found.  Please click the add instance button to get started.
+        </div>
+    }
+</div>

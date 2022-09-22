@@ -1,0 +1,65 @@
+﻿@model Octopus.Trident.Web.Core.Models.ViewModels.PagedViewModel<Octopus.Trident.Web.Core.Models.SyncModel>
+@{
+    ViewData["Title"] = "Sync Jobs";
+}
+
+<div class="text-center">
+    @if (Model.Items.Count > 0)
+    {
+        <table class='table table-striped'>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Created</th>
+                <th>State</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Created</td>
+                    <td>@item.State</td>
+                    <td>Details</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <nav aria-label="paging">
+            <ul class="pagination">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-currentPage="@Model.PreviousPage">Previous</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Previous</a>
+                    </li>
+                }
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-currentPage="@Model.NextPage">Next</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <div class="alert-info form-control">
+            No Sync Jobs Found.  Please click sync button on an instance to create one.
+        </div>
+    }
+</div>

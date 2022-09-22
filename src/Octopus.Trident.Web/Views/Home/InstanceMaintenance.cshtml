@@ -1,0 +1,52 @@
+﻿@model Octopus.Trident.Web.Core.Models.InstanceModel
+
+@{
+    ViewData["Title"] = "View";
+}
+
+@if (Model.Id > 0)
+{
+    <h1>Edit Instance @Model.Name</h1>
+}
+else
+{
+    <h1>Create Instance</h1>
+}
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Url" class="control-label"></label>
+                <input asp-for="Url" class="form-control" />
+                <span asp-validation-for="Url" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ApiKey" class="control-label">API Key</label>
+                <input asp-for="ApiKey" class="form-control" />
+                <span asp-validation-for="ApiKey" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OctopusId" class="control-label">Installation Id</label>
+                <input asp-for="OctopusId" class="form-control" />
+                <span asp-validation-for="OctopusId" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="Id"/>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" asp-action="Save"/>
+                &nbsp;
+                <a asp-action="Index" class="btn btn-info">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

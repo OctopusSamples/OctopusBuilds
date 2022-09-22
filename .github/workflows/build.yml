@@ -1,0 +1,145 @@
+name: Build CI
+
+on:
+  push:
+    branches: 
+      - main
+      - 'feature/**'
+      - 'bugfix/**'
+  workflow_dispatch:
+
+env:
+  OCTOPUS_PROJECT_NAME: Trident
+  OCTOPUS_FEATURE_BRANCH_CHANNEL: Default
+  OCTOPUS_FEATURE_BRANCH_ENVIRONMENT: Development
+  OCTOPUS_RELEASE_CHANNEL: Release
+  OCTOPUS_RELEASE_ENVIRONMENT: Staging
+  OCTOPUS_TENANT_NAME: Internal
+  OCTOPUS_SPACE_NAME: Octopus Builds
+
+jobs:
+
+  get-release-information:
+    runs-on: windows-latest
+    outputs:
+      OCTOPUS_CHANNEL: ${{ steps.step1.outputs.OctopusChannelName }}
+      OCTOPUS_ENVIRONMENT: ${{ steps.step1.outputs.OctopusEnvironmentName }}
+      VERSION: ${{ steps.step1.outputs.OctopusVersionNumber }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: step1
+        name: Get Octopus Information
+        run: |
+          $locationOfProject = "src/Octopus.Trident.Web/Octopus.Trident.Web.csproj"
+          $projectContents = Get-Content $locationOfProject
+          $projectAsXML = [xml]$projectContents
+          $versionPrefix = $projectAsXML.Project.PropertyGroup.VersionPrefix
+
+          Write-Host "The version prefix is $versionPrefix"
+
+          $branchName = (((${env:GITHUB_REF} -replace "refs/heads/", "") -replace "feature/", "") -replace "bugfix/", "") -replace " ", ""
+          Write-Host "The Branch Name is: $branchName"
+
+          $channelName = "${env:OCTOPUS_RELEASE_CHANNEL}"
+          Write-Host "The channel name is now $channelName"
+          $environmentName = "${env:OCTOPUS_RELEASE_ENVIRONMENT}"
+          Write-Host "The environment name is now $environmentName"
+          $versionNumber = "$($versionPrefix).${env:GITHUB_RUN_NUMBER}"
+          Write-Host "The version number is now $versionNumber"
+
+          if ($branchName -ne "main")
+          {
+              Write-Host "The branch is not the main branch, using the feature branch settings instead."
+              
+              $channelName = "${env:OCTOPUS_FEATURE_BRANCH_CHANNEL}"
+              Write-Host "The channel name is now $channelName"
+              $environmentName = "${env:OCTOPUS_FEATURE_BRANCH_ENVIRONMENT}"
+              Write-Host "The environment name is now $environmentName"
+              $versionNumber = "$versionNumber-$branchName"
+              Write-Host "The version number is now $versionNumber"
+          }
+
+          Write-Host "Setting the Output Variable OCTOPUS_CHANNEL to $channelName"
+          echo "::set-output name=OctopusChannelName::$channelName"
+
+          Write-Host "Setting the Output Variable VERSION to $versionNumber"
+          echo "::set-output name=OctopusVersionNumber::$versionNumber"
+
+          Write-Host "Setting the Output Variable OCTOPUS_ENVIRONMENT to $environmentName"
+          echo "::set-output name=OctopusEnvironmentName::$environmentName"
+
+        shell: powershell
+  build-and-push-application:
+    needs: [get-release-information]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['6.0.x']
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: create artifacts folder
+        run: |
+          mkdir "$GITHUB_WORKSPACE/artifacts"
+          mkdir "$GITHUB_WORKSPACE/artifacts/web"
+          mkdir "$GITHUB_WORKSPACE/artifacts/database"
+
+      - name: install octopus cli
+        uses: OctopusDeploy/install-octopus-cli-action@v1.1.8
+        with:
+          version: latest
+
+      - name: restore dependencies for application
+        working-directory: src
+        run: dotnet restore
+
+      - name: build website
+        env:
+          VERSION_NUMBER: ${{ needs.get-release-information.outputs.VERSION }}  
+        working-directory: src/Octopus.Trident.Web
+        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/web" -c Release --runtime win-x64 --sc false --p:Version=$VERSION_NUMBER
+
+      - name: package website
+        env:
+          VERSION_NUMBER: ${{ needs.get-release-information.outputs.VERSION }}  
+        run: |
+          octo pack --id="Trident.Web" --format="Zip" --version="$VERSION_NUMBER" --basePath="$GITHUB_WORKSPACE/artifacts/web" --outFolder="$GITHUB_WORKSPACE/artifacts"
+
+      - name: build database
+        env:
+          VERSION_NUMBER: ${{ needs.get-release-information.outputs.VERSION }}  
+        working-directory: src/Octopus.Trident.Database.DbUp
+        run: dotnet publish --output "$GITHUB_WORKSPACE/artifacts/database" -c Release --runtime win-x64 --sc true --p:PublishSingleFile=true --p:PublishTrimmed=true --p:Version=$VERSION_NUMBER
+      
+      - name: package database
+        env:
+          VERSION_NUMBER: ${{ needs.get-release-information.outputs.VERSION }}  
+        run: |
+          octo pack --id="Trident.Database" --format="Zip" --version="$VERSION_NUMBER" --basePath="$GITHUB_WORKSPACE/artifacts/database" --outFolder="$GITHUB_WORKSPACE/artifacts"
+
+      - name: push packages to Octopus
+        uses: OctopusDeploy/push-package-action@v1.1.1
+        with:
+          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          server: ${{ secrets.OCTOPUSSERVERURL }}
+          space: ${{ env.OCTOPUS_SPACE_NAME }}
+          packages: "artifacts/Trident.Database.${{ needs.get-release-information.outputs.VERSION }}.zip,artifacts/Trident.Web.${{ needs.get-release-information.outputs.VERSION }}.zip"
+
+      - name: create and deploy release
+        uses: OctopusDeploy/create-release-action@v1.1.1
+        with:
+          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          server: ${{ secrets.OCTOPUSSERVERURL }}
+          space: ${{ env.OCTOPUS_SPACE_NAME }}
+          project: ${{ env.OCTOPUS_PROJECT_NAME }}
+          channel: ${{ needs.get-release-information.outputs.OCTOPUS_CHANNEL }}
+          deploy_to: ${{ needs.get-release-information.outputs.OCTOPUS_ENVIRONMENT }}
+          release_number: ${{ needs.get-release-information.outputs.VERSION }}
+          tenant: ${{env.OCTOPUS_TENANT_NAME }}
+          package_version: ${{ needs.get-release-information.outputs.VERSION }}
+       

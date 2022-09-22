@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="BeforeDeploymentScripts\**" />
+      <EmbeddedResource Remove="BeforeDeploymentScripts\**" />
+      <None Remove="BeforeDeploymentScripts\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="DeploymentScripts\001_CreateInstanceTable.sql" />
+      <None Remove="DeploymentScripts\002_CreateSpaceTable.sql" />
+      <None Remove="DeploymentScripts\003_CreateSyncTable.sql" />
+      <None Remove="DeploymentScripts\004_CreateSyncLogTable.sql" />
+      <None Remove="DeploymentScripts\005_CreateTenantTable.sql" />
+      <None Remove="DeploymentScripts\006_CreateProjectTable.sql" />
+      <None Remove="DeploymentScripts\007_CreateEnvironmentTable.sql" />
+      <None Remove="DeploymentScripts\008_CreateReleaseTable.sql" />
+      <None Remove="DeploymentScripts\009_CreateDeploymentTable.sql" />
+      <None Remove="DeploymentScripts\010_CreateWebUserRole.sql" />
+      <None Remove="PostDeploymentScripts\001_GrantWebUserRolePermissions.sql" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="DeploymentScripts\001_CreateInstanceTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\002_CreateSpaceTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\003_CreateSyncTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\004_CreateSyncLogTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\005_CreateTenantTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\006_CreateProjectTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\007_CreateEnvironmentTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\008_CreateReleaseTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\009_CreateDeploymentTable.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="DeploymentScripts\010_CreateWebUserRole.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="PostDeploymentScripts\001_GrantWebUserRolePermissions.sql">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="dbup-sqlserver" Version="4.6.0" />
+    </ItemGroup>
+
+</Project>

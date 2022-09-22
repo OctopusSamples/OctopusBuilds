@@ -1,0 +1,130 @@
+﻿@model Octopus.Trident.Web.Core.Models.ViewModels.ReportingViewModel
+@{
+    ViewData["Title"] = @Model.Instance.Name + " Insights";
+}
+
+<div class="row">
+    <div class="col-2">
+        <div class="form-group">
+            <label for="chartType">Chart Type</label>
+            <select id="chartType" class="form-control">
+                <option value="deploymentcounts:line">Deployment Counts</option>
+                <option value="projectdeploycounts:horizontalBar">Deployments Per Project</option>
+                <option value="environmentdeploycounts:bar">Deployments Per Environment</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input id="startDate" class="form-control" value="@DateTime.UtcNow.AddDays(-30).ToString("yyyy-MM-dd")" type="date" />
+        </div>
+        <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input id="endDate" class="form-control" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" type="date" />
+        </div>
+        <div class="form-group">
+            <label for="space">Space</label>
+            <select id="space" class="form-control">
+                <option value="0">All Spaces</option>
+                @foreach (var space in Model.SpaceList)
+                {
+                    <option value="@space.Id">@space.Name</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="button" id="startSearch" class="btn btn-primary" value="Search" />
+        </div>
+    </div>
+    <div class="col-10">
+        <canvas id="insightChart"></canvas>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+
+    <script>
+        var chart, myChart;
+        var instanceId = '@Model.Instance.Id';
+
+        $(document).ready(function() {
+            chart = document.getElementById('insightChart').getContext('2d');
+            
+            $('#startSearch').click(function() {
+                var search = {
+                    startDate: $('#startDate').val(),
+                    endDate: $('#endDate').val(),
+                    spaceId: parseInt($('#space').val())
+                };
+
+                var selectedChart = $('#chartType').val().split(':');
+
+                var endPoint = "/api/instances/" + instanceId + "/reports/" + selectedChart[0];
+
+                $.ajax({
+                    type: "POST",
+                    url: endPoint,
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(search),
+                    success: function(response) {
+                        if (myChart) {
+                            myChart.destroy();
+                        }
+
+                        myChart = new Chart(chart,
+                            {
+                                type: selectedChart[1],
+                                data: {
+                                    labels: response.labels,
+                                    datasets: [
+                                        {
+                                            label: "Results",
+                                            data: response.values
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    scales: {
+                                        yAxes: [
+                                            {
+                                                ticks: {
+                                                    beginAtZero: true
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            });
+                    },
+                    error: function(response) {
+                        console.log(response);
+                    }
+                });
+            });
+        });
+
+        function addData(labels, data, type) {
+            myChart.type = type;
+            for (var i = 0; i < labels.length; i++) {
+                myChart.data.labels.push(labels[i]);    
+            }
+            myChart.data.datasets.forEach((dataset) => {
+                for (var i = 0; i < data.length; i++) {
+                    dataset.data.push(data[i]);    
+                }
+            });
+
+            myChart.update();
+        }
+
+        function removeData() {
+            myChart.data.labels = [];
+            myChart.data.datasets.forEach((dataset) => {
+                dataset.data = [];
+            });
+            myChart.update();
+        }
+    </script>
+}
