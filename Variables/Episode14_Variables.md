@@ -1,5 +1,6 @@
 Add the following variables
 - Project.Connection.String: Server=(localdb)\MSSQLLocalDB;Integrated Security=true;Database=#{Project.Database.Name}
+- Project.Database.Report.Path: C:\DatabaseReports\#{Octopus.Environment.Name}
 
 Change the following variables
 - ConnectionStrings:Database
