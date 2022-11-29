@@ -11,3 +11,6 @@ Change the following variables
     - New Value: Trident (scoped to Production)
     - New Value: Trident_#{Octopus.Environment.Name} (Scoped to Dev, QA, Staging)
 
+Delete the following variables:
+- Project.Database.User.Name
+- Project.Database.User.Password
