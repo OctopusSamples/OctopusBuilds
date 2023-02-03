@@ -1,3 +1,45 @@
-- Notification.Body.Text: You can view the the deployment here: #{Octopus.Web.ServerUri}/app#/#{Octopus.Space.Id}/tasks/#{Octopus.Task.Id}
-- Notification.Subject.Text: #{Octopus.Project.Name} #{Octopus.Release.Number} to #{Octopus.Environment.Name} has #{if Octopus.Deployment.Error}failed#{else}completed successfully#{/if}
-- Notification.Slack.Webhook.Url: This is provided by your slack administrator
+Notification Library Variable Set
+- Notification Body Variable (new!)
+    - Name: Notification.Body.Text
+    - Value: You can view the the deployment here: #{Octopus.Web.ServerUri}/app#/#{Octopus.Space.Id}/tasks/#{Octopus.Task.Id}
+    - Type: Text
+- Notification Subject (new!)
+    - Name: Notification.Subject.Text
+    - Value: #{Octopus.Project.Name} #{Octopus.Release.Number} to #{Octopus.Environment.Name} has #{if Octopus.Deployment.Error}failed#{else}completed successfully#{/if}
+    - Type: Text
+- Slack Webhook URL (new!)
+    - Name: Notification.Slack.Webhook.Url
+    - Value: Use the value provided by your slack administrator
+    - Type: Text
+
+
+Trident Project Variables (NO CHANGES TO BE MADE)
+- Connection String Variable For Configuration Transform
+    - Name: ConnectionStrings:Database
+    - Value: Server=#{Project.Database.Server.Name};Database=#{Project.Database.Name};User ID=#{Project.Database.User.Name};Password=#{Project.Database.User.Password};
+    - Type: Text
+- Database Name Variable
+    - Name: Project.Database.Name 
+    - Value: Trident
+    - Type: Text
+- Database Server Variable
+    - Name: Project.Database.Server.Name
+    - Value: Trident_Dev (Development Scoping)
+    - Value: Trident_QA (QA Scoping)
+    - Value: Trident_Staging (Staging Scoping)
+    - Value: Trident_Prod (Production Scoping)
+    - Type: Text
+- Database User Name Variable    
+    - Name: Project.Database.User.Name
+    - Value: Trident_User_Dev (Development Scoping)
+    - Value: Trident_User_QA (QA Scoping)
+    - Value: Trident_User_Staging (Staging Scoping)
+    - Value: Trident_User_Prod (Production Scoping)
+    - Type: Sensitive
+- Database User Password Variable
+    - Name: Project.Database.User.Password
+    - Value: Trident_User_Dev01! (Development Scoping)
+    - Value: Trident_User_QA01! (QA Scoping)
+    - Value: Trident_User_Staging01! (Staging Scoping)
+    - Value: Trident_User_Prod01! (Production Scoping)
+    - Type: Sensitive

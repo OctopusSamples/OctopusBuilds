@@ -1,17 +1,30 @@
-- ConnectionStrings:Database - Server=#{Project.Database.Server.Name};Database=#{Project.Database.Name};User ID=#{Project.Database.User.Name};Password=#{Project.Database.User.Password};
-- Project.Database.Name - Trident
-- Project.Database.Server.Name
-    - Trident_Dev (Development Scoping)
-    - Trident_QA (QA Scoping)
-    - Trident_Staging (Staging Scoping)
-    - Trident_Prod (Production Scoping)
-- Project.Database.User.Name
-    - Trident_User_Dev (Development Scoping)
-    - Trident_User_QA (QA Scoping)
-    - Trident_User_Staging (Staging Scoping)
-    - Trident_User_Prod (Production Scoping)
-- Project.Database.User.Password
-    - Trident_User_Dev01! (Development Scoping)
-    - Trident_User_QA01! (QA Scoping)
-    - Trident_User_Staging01! (Staging Scoping)
-    - Trident_User_Prod01! (Production Scoping)
+Trident Project Variables
+- Connection String Variable For Configuration Transform (new!)
+    - Name: ConnectionStrings:Database
+    - Value: Server=#{Project.Database.Server.Name};Database=#{Project.Database.Name};User ID=#{Project.Database.User.Name};Password=#{Project.Database.User.Password};
+    - Type: Text
+- Database Name Variable (new!)
+    - Name: Project.Database.Name 
+    - Value: Trident
+    - Type: Text
+- Database Server Variable (new!)
+    - Name: Project.Database.Server.Name
+    - Value: Trident_Dev (Development Scoping)
+    - Value: Trident_QA (QA Scoping)
+    - Value: Trident_Staging (Staging Scoping)
+    - Value: Trident_Prod (Production Scoping)
+    - Type: Text
+- Database User Name Variable (new!)
+    - Name: Project.Database.User.Name
+    - Value: Trident_User_Dev (Development Scoping)
+    - Value: Trident_User_QA (QA Scoping)
+    - Value: Trident_User_Staging (Staging Scoping)
+    - Value: Trident_User_Prod (Production Scoping)
+    - Type: Sensitive
+- Database User Password Variable (new!)
+    - Name: Project.Database.User.Password
+    - Value: Trident_User_Dev01! (Development Scoping)
+    - Value: Trident_User_QA01! (QA Scoping)
+    - Value: Trident_User_Staging01! (Staging Scoping)
+    - Value: Trident_User_Prod01! (Production Scoping)
+    - Type: Sensitive
