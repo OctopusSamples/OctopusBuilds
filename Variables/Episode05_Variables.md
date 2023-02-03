@@ -13,7 +13,7 @@ Notification Library Variable Set
     - Type: Text
 
 
-Trident Project Variables (NO CHANGES TO BE MADE)
+Trident Project Variables (NO CHANGES NEED TO BE MADE)
 - Connection String Variable For Configuration Transform
     - Name: ConnectionStrings:Database
     - Value: Server=#{Project.Database.Server.Name};Database=#{Project.Database.Name};User ID=#{Project.Database.User.Name};Password=#{Project.Database.User.Password};

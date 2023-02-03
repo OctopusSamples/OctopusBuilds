@@ -1,19 +1,40 @@
-Add the following variables
-- Project.Connection.String: Server=#{Project.Database.Server.Name};Integrated Security=true;Database=#{Project.Database.Name}
-- Project.Runbook.Api.Key
-    - Sensitive Variable
-    - API Key of Service Account
+Trident Project Variables 
+- Runbook API Key Variable (NEW!)
+    - Name: Project.Runbook.Api.Key
+    - Value: The API Key you creted
+    - Type: Sensitive
+- Connection String For Database Deployments
+    - Name: Project.Connection.String
+    - Value: Server=#{Project.Database.Server.Name};Integrated Security=true;Database=#{Project.Database.Name}
+    - Type: Text
+- Report Path Variable
+    - Name: Project.Database.Report.Path
+    - Value: C:\DatabaseReports\\#{Octopus.Environment.Name}
+    - Type: Text
+- Connection String Variable For Configuration Transform
+    - Name: ConnectionStrings:Database
+    - Value: #{Project.Connection.String}
+    - Type: Text
+- Database Name Variable
+    - Name: Project.Database.Name     
+    - Value: Trident (Production Scoping)
+    - Value: Trident_#{Octopus.Environment.Name}
+    - Type: Text
+- Database Server Variable
+    - Name: Project.Database.Server.Name    
+    - Value: (localdb)\MSSQLLocalDB
+    - Type: Text
 
-Change the following variables
-- ConnectionStrings:Database
-    - New Value: #{Project.Connection.String}
-- Project.Database.Name
-    - New Value: Trident (scoped to Production)
-    - New Value: Trident_#{Octopus.Environment.Name} (Scoped to Dev, QA, Staging)
-- Project.Database.Server.Name
-    - New Value: (localdb)\MSSQLLocalDB (unscoped)
-    - Remove all other scoped values
-
-Delete the following variables:
-- Project.Database.User.Name
-- Project.Database.User.Password
+Notification Library Variable Set (NO CHANGES NEED TO BE MADE)
+- Notification Body Variable 
+    - Name: Notification.Body.Text
+    - Value: You can view the the deployment here: #{Octopus.Web.ServerUri}/app#/#{Octopus.Space.Id}/tasks/#{Octopus.Task.Id}
+    - Type: Text
+- Notification Subject 
+    - Name: Notification.Subject.Text
+    - Value: #{Octopus.Project.Name} #{Octopus.Release.Number} to #{Octopus.Environment.Name} has #{if Octopus.Deployment.Error}failed#{else}completed successfully#{/if}
+    - Type: Text
+- Slack Webhook URL (new!)
+    - Name: Notification.Slack.Webhook.Url
+    - Value: Use the value provided by your slack administrator
+    - Type: Text

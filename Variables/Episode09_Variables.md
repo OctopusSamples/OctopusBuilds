@@ -1,19 +1,62 @@
+Trident Project Variables 
+- Connection String For Database Deployments (NEW!)
+    - Name: Project.Connection.String
+    - Value: Server=#{Project.Database.Server.Name};Integrated Security=true;Database=#{Project.Database.Name}
+    - Type: Text
+- Report Path Variable (NEW!)
+    - Name: Project.Database.Report.Path
+    - Value: C:\DatabaseReports\\#{Octopus.Environment.Name}
+    - Type: Text
+- Connection String Variable For Configuration Transform (Update)
+    - Name: ConnectionStrings:Database
+    - ~~Value: Server=#{Project.Database.Server.Name};Database=#{Project.Database.Name};User ID=#{Project.Database.User.Name};Password=#{Project.Database.User.Password};~~
+    - Value: #{Project.Connection.String}
+    - Type: Text
+- Database Name Variable (Update)
+    - Name: Project.Database.Name 
+    - ~~Value: Trident~~
+    - Value: Trident (Production Scoping)
+    - Value: Trident_#{Octopus.Environment.Name}
+    - Type: Text
+- Database Server Variable (Update)
+    - Name: Project.Database.Server.Name
+    - ~~Value: Trident_Dev (Development Scoping)~~
+    - ~~Value: Trident_QA (QA Scoping)~~
+    - ~~Value: Trident_Staging (Staging Scoping)~~
+    - ~~Value: Trident_Prod (Production Scoping)~~
+    - Value: (localdb)\MSSQLLocalDB
+    - Type: Text
+- Database User Name Variable (Delete)   
+    - Name: Project.Database.User.Name
+    - ~~Value: Trident_User_Dev (Development Scoping)~~
+    - ~~Value: Trident_User_QA (QA Scoping)~~
+    - ~~Value: Trident_User_Staging (Staging Scoping)~~
+    - ~~Value: Trident_User_Prod (Production Scoping)~~
+    - ~~Type: Sensitive~~
+- Database User Password Variable (Delete)
+    - Name: Project.Database.User.Password
+    - ~~Value: Trident_User_Dev01! (Development Scoping)~~
+    - ~~Value: Trident_User_QA01! (QA Scoping)~~
+    - ~~Value: Trident_User_Staging01! (Staging Scoping)~~
+    - ~~Value: Trident_User_Prod01! (Production Scoping)~~
+    - ~~Type: Sensitive~~
+
+Notification Library Variable Set (NO CHANGES NEED TO BE MADE)
+- Notification Body Variable 
+    - Name: Notification.Body.Text
+    - Value: You can view the the deployment here: #{Octopus.Web.ServerUri}/app#/#{Octopus.Space.Id}/tasks/#{Octopus.Task.Id}
+    - Type: Text
+- Notification Subject 
+    - Name: Notification.Subject.Text
+    - Value: #{Octopus.Project.Name} #{Octopus.Release.Number} to #{Octopus.Environment.Name} has #{if Octopus.Deployment.Error}failed#{else}completed successfully#{/if}
+    - Type: Text
+- Slack Webhook URL (new!)
+    - Name: Notification.Slack.Webhook.Url
+    - Value: Use the value provided by your slack administrator
+    - Type: Text
+
+
 Add the following variables
-- Project.Connection.String: Server=#{Project.Database.Server.Name};Integrated Security=true;Database=#{Project.Database.Name}
 - Project.Runbook.Api.Key
     - Sensitive Variable
     - API Key of Service Account
-
-Change the following variables
-- ConnectionStrings:Database
-    - New Value: #{Project.Connection.String}
-- Project.Database.Name
-    - New Value: Trident (scoped to Production)
-    - New Value: Trident_#{Octopus.Environment.Name} (Scoped to Dev, QA, Staging)
-- Project.Database.Server.Name
-    - New Value: (localdb)\MSSQLLocalDB (unscoped)
-    - Remove all other scoped values
-
-Delete the following variables:
-- Project.Database.User.Name
-- Project.Database.User.Password
